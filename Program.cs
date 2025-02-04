@@ -4,6 +4,16 @@ using System.Collections.Generic;
 using System.Text;
 
 //ЗАВДАННЯ 1
+
+public static class CollectionExtensions
+{
+    // Узагальнений метод для підрахунку входжень
+    public static int CountOccurrences<T>(this IEnumerable<T> collection, T value) where T : IEquatable<T>
+    {
+        if (collection == null) return 0;
+        return collection.Count(item => item.Equals(value));
+    }
+}
 public static class StringExtensions
 {
     // Інвертування рядка
@@ -12,24 +22,10 @@ public static class StringExtensions
         if (input == null) return null;
         return new string(input.Reverse().ToArray());
     }
-
-    // Підрахунок кількості входжень символа у рядок
-    public static int CountOccurrences(this string input, char symbol)
-    {
-        if (input == null) return 0;
-        return input.Count(c => c == symbol);
-    }
 }
 
 public static class ArrayExtensions
 {
-    // Підрахунок кількості входжень значення у масиві
-    public static int CountOccurrences<T>(this T[] array, T value) where T : IEquatable<T>
-    {
-        if (array == null) return 0;
-        return array.Count(item => item.Equals(value));
-    }
-
     // Отримання масиву унікальних елементів
     public static T[] ToUniqueArray<T>(this T[] array)
     {
@@ -115,11 +111,11 @@ class Program
         Console.WriteLine("Перевірка роботи методів розширення класу String:");
         string text = "hello world";
         Console.WriteLine($"Інвертування: {text.ReverseString()}");
-        Console.WriteLine($"Кількість входжень символу 'l': {text.CountOccurrences('l')}");
+        Console.WriteLine($"Кількість входжень символу 'l': {text.ToCharArray().CountOccurrences('l')}");
 
         Console.WriteLine("Перевірка роботи методів розширення одновимірних масивів:");
         int[] numbers = { 1, 2, 2, 3, 4, 4, 4, 5 };
-        Console.WriteLine($"Кількість входжень символу 4: {numbers.CountOccurrences(4)}");
+        Console.WriteLine($"Кількість входжень числа 4: {numbers.CountOccurrences(4)}");
         Console.WriteLine($"Масив унікальних символів: {string.Join(", ", numbers.ToUniqueArray())}");
         //-----------------------------------------------------------------------------------------------
         //-----------------------------------------------------------------------------------------------
