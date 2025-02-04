@@ -71,36 +71,36 @@ class Program
     static void Main(string[] args)
     {
         Console.OutputEncoding = Encoding.UTF8;
-        Console.WriteLine("Перевірка роботи методів розширення класу String:");
+
+        TestStringExtensions();
+        TestArrayExtensions();
+        TestExtendedDictionary();
+    }
+
+    static void TestStringExtensions()
+    {
         string text = "hello world";
         Console.WriteLine($"Інвертування: {text.ReverseString()}");
-        Console.WriteLine($"Кількість входжень символу 'l': {text.ToCharArray().CountOccurrences('l')}");
-
-        Console.WriteLine("Перевірка роботи методів розширення одновимірних масивів:");
+        Console.WriteLine($"Кількість входжень символу 'l': {text.CountOccurrences('l')}");
+    }
+    static void TestArrayExtensions()
+    {
         int[] numbers = { 1, 2, 2, 3, 4, 4, 4, 5 };
         Console.WriteLine($"Кількість входжень числа 4: {numbers.CountOccurrences(4)}");
-        Console.WriteLine($"Масив унікальних символів: {string.Join(", ", numbers.ToUniqueArray())}");
-        //-----------------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------------
-        Console.WriteLine();
-        Console.WriteLine("Приклад роботи з словником:");
+        Console.WriteLine($"Масив унікальних елементів: {string.Join(", ", numbers.ToUniqueArray())}");
+    }
+
+    static void TestExtendedDictionary()
+    {
         var dictionary = new ExtendedDictionary<int, string, string>();
         dictionary.Add(1, "Аліса", "Менеджер");
         dictionary.Add(2, "Василь", "Розробник");
         dictionary.Add(3, "Роман", "Аналітик");
 
-        Console.WriteLine($"Чи існує елемент який має ключ 2: {dictionary.ContainsKey(2)}");
-        Console.WriteLine($"Чи існує елемент який має значення (Аліса, Менеджер): {dictionary.ContainsValue("Аліса", "Менеджер")}");
-        Console.WriteLine($"Передати елемент з ключем 1: {dictionary[1].Value1}, {dictionary[1].Value2}");
+        Console.WriteLine($"Чи існує ключ 2: {dictionary.ContainsKey(2)}");
+        Console.WriteLine($"Значення для ключа 1: {dictionary[1]}");
 
         dictionary.Remove(2);
         Console.WriteLine($"Кількість елементів після видалення ключа 2: {dictionary.Count}");
-
-        Console.WriteLine("Перечислення цих елементів: ");
-        foreach (var element in dictionary)
-        {
-            Console.WriteLine($"Key: {element.Key}, Value1: {element.Value1}, Value2: {element.Value2}");
-        }
-
     }
 }
