@@ -4,6 +4,16 @@ using System.Collections.Generic;
 using System.Text;
 
 //ЗАВДАННЯ 1
+
+public static class CollectionExtensions
+{
+    // Узагальнений метод для підрахунку входжень
+    public static int CountOccurrences<T>(this IEnumerable<T> collection, T value) where T : IEquatable<T>
+    {
+        if (collection == null) return 0;
+        return collection.Count(item => item.Equals(value));
+    }
+}
 public static class StringExtensions
 {
     // Інвертування рядка
@@ -12,24 +22,10 @@ public static class StringExtensions
         if (input == null) return null;
         return new string(input.Reverse().ToArray());
     }
-
-    // Підрахунок кількості входжень символа у рядок
-    public static int CountOccurrences(this string input, char symbol)
-    {
-        if (input == null) return 0;
-        return input.Count(c => c == symbol);
-    }
 }
 
 public static class ArrayExtensions
 {
-    // Підрахунок кількості входжень значення у масиві
-    public static int CountOccurrences<T>(this T[] array, T value) where T : IEquatable<T>
-    {
-        if (array == null) return 0;
-        return array.Count(item => item.Equals(value));
-    }
-
     // Отримання масиву унікальних елементів
     public static T[] ToUniqueArray<T>(this T[] array)
     {
@@ -39,72 +35,35 @@ public static class ArrayExtensions
 }
 
 //ЗАВДАННЯ 2
-public class ExtendedDictionaryElement<T, U, V>
+
+public class ExtendedDictionary<T, U, V> : IEnumerable<Tuple<T, U, V>>
 {
-    public T Key { get; set; }
-    public U Value1 { get; set; }
-    public V Value2 { get; set; }
+    private Dictionary<T, Tuple<T, U, V>> elements = new();
 
-    public ExtendedDictionaryElement(T key, U value1, V value2)
-    {
-        Key = key;
-        Value1 = value1;
-        Value2 = value2;
-    }
-}
-
-public class ExtendedDictionary<T, U, V> : IEnumerable<ExtendedDictionaryElement<T, U, V>>
-{
-    private List<ExtendedDictionaryElement<T, U, V>> elements = new();
-
-    // Додавання елемента
     public void Add(T key, U value1, V value2)
     {
-        if (elements.Any(e => e.Key.Equals(key)))
-            throw new ArgumentException("Key already exists.");
-        elements.Add(new ExtendedDictionaryElement<T, U, V>(key, value1, value2));
+        if (elements.ContainsKey(key))
+            throw new ArgumentException($"Key {key} already exists.", nameof(key));
+
+        elements[key] = Tuple.Create(key, value1, value2);
     }
 
-    // Видалення елемента
-    public bool Remove(T key)
-    {
-        return elements.RemoveAll(e => e.Key.Equals(key)) > 0;
-    }
+    public bool Remove(T key) => elements.Remove(key);
 
-    // Перевірка наявності ключа
-    public bool ContainsKey(T key)
-    {
-        return elements.Any(e => e.Key.Equals(key));
-    }
+    public bool ContainsKey(T key) => elements.ContainsKey(key);
 
-    // Перевірка наявності значення
-    public bool ContainsValue(U value1, V value2)
-    {
-        return elements.Any(e => e.Value1.Equals(value1) && e.Value2.Equals(value2));
-    }
+    public Tuple<T, U, V> this[T key] => elements.TryGetValue(key, out var element) ? element
+        : throw new KeyNotFoundException($"Key {key} not found.");
 
-    // Повернення елемента за ключем
-    public ExtendedDictionaryElement<T, U, V> this[T key]
-    {
-        get => elements.FirstOrDefault(e => e.Key.Equals(key))
-               ?? throw new KeyNotFoundException("Ключ не знайдено.");
-    }
-
-    // Кількість елементів
     public int Count => elements.Count;
 
-    // Реалізація foreach для IEnumerable<T>
-    public IEnumerator<ExtendedDictionaryElement<T, U, V>> GetEnumerator()
-    {
-        return elements.GetEnumerator();
-    }
+    public IEnumerator<Tuple<T, U, V>> GetEnumerator() => elements.Values.GetEnumerator();
 
-    // Реалізація foreach для IEnumerable
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
+
+
+
 
 
 class Program
@@ -124,7 +83,6 @@ class Program
         Console.WriteLine($"Інвертування: {text.ReverseString()}");
         Console.WriteLine($"Кількість входжень символу 'l': {text.CountOccurrences('l')}");
     }
-
     static void TestArrayExtensions()
     {
         int[] numbers = { 1, 2, 2, 3, 4, 4, 4, 5 };
