@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-// Хелпер для перевірки аргументів
 public static class Guard
 {
     public static void ThrowIfNull<T>(T obj, string paramName)
@@ -12,12 +11,8 @@ public static class Guard
         if (obj == null) throw new ArgumentNullException(paramName);
     }
 }
-
-// ЗАВДАННЯ 1
-
 public static class CollectionExtensions
 {
-    // Узагальнений метод для підрахунку входжень
     public static int CountOccurrences<T>(this IEnumerable<T> collection, T value) where T : IEquatable<T>
     {
         Guard.ThrowIfNull(collection, nameof(collection));
@@ -27,7 +22,6 @@ public static class CollectionExtensions
 
 public static class StringExtensions
 {
-    // Інвертування рядка
     public static string ReverseString(this string input)
     {
         Guard.ThrowIfNull(input, nameof(input));
@@ -37,7 +31,7 @@ public static class StringExtensions
 
 public static class ArrayExtensions
 {
-    // Отримання масиву унікальних елементів
+
     public static T[] ToUniqueArray<T>(this T[] array)
     {
         Guard.ThrowIfNull(array, nameof(array));
@@ -45,12 +39,10 @@ public static class ArrayExtensions
     }
 }
 
-// ЗАВДАННЯ 2
-
 public class ExtendedDictionary<T, U, V> : IEnumerable<Tuple<T, U, V>>
 {
-    private Dictionary<T, Tuple<T, U, V>> elements = new();
-
+    private readonly Dictionary<T, Tuple<T, U, V>> elements = new();
+    
     public void Add(T key, U value1, V value2)
     {
         if (elements.ContainsKey(key))
@@ -58,11 +50,10 @@ public class ExtendedDictionary<T, U, V> : IEnumerable<Tuple<T, U, V>>
 
         elements[key] = Tuple.Create(key, value1, value2);
     }
-
     public bool Remove(T key) => elements.Remove(key);
 
     public bool ContainsKey(T key) => elements.ContainsKey(key);
-
+    
     public Tuple<T, U, V> this[T key] => elements.TryGetValue(key, out var element)
         ? element
         : throw new KeyNotFoundException($"Key {key} not found.");
@@ -85,6 +76,9 @@ class Program
         TestExtendedDictionary();
     }
 
+    /// <summary>
+    /// Тестує розширення для роботи з рядками.
+    /// </summary>
     static void TestStringExtensions()
     {
         string text = "hello world";
@@ -92,6 +86,9 @@ class Program
         Console.WriteLine($"Кількість входжень символу 'l': {text.CountOccurrences('l')}");
     }
 
+    /// <summary>
+    /// Тестує розширення для роботи з масивами.
+    /// </summary>
     static void TestArrayExtensions()
     {
         int[] numbers = { 1, 2, 2, 3, 4, 4, 4, 5 };
@@ -99,6 +96,9 @@ class Program
         Console.WriteLine($"Масив унікальних елементів: {string.Join(", ", numbers.ToUniqueArray())}");
     }
 
+    /// <summary>
+    /// Тестує роботу розширеного словника.
+    /// </summary>
     static void TestExtendedDictionary()
     {
         var dictionary = new ExtendedDictionary<int, string, string>();
