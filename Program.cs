@@ -11,8 +11,12 @@ public static class Guard
         if (obj == null) throw new ArgumentNullException(paramName);
     }
 }
+
 public static class CollectionExtensions
 {
+    /// <summary>
+    /// Підраховує кількість входжень значення у колекцію.
+    /// </summary>
     public static int CountOccurrences<T>(this IEnumerable<T> collection, T value) where T : IEquatable<T>
     {
         Guard.ThrowIfNull(collection, nameof(collection));
@@ -22,7 +26,7 @@ public static class CollectionExtensions
 
 public static class StringExtensions
 {
-    public static string ReverseString(this string input)
+    public static string Reverse(this string input)
     {
         Guard.ThrowIfNull(input, nameof(input));
         return new string(input.Reverse().ToArray());
@@ -32,35 +36,36 @@ public static class StringExtensions
 public static class ArrayExtensions
 {
 
-    public static T[] ToUniqueArray<T>(this T[] array)
+    public static T[] GetUniqueElements<T>(this T[] array)
     {
         Guard.ThrowIfNull(array, nameof(array));
         return array.Distinct().ToArray();
     }
 }
 
-public class ExtendedDictionary<T, U, V> : IEnumerable<Tuple<T, U, V>>
+public class TripleDictionary<TKey, TValue1, TValue2> : IEnumerable<Tuple<TKey, TValue1, TValue2>>
 {
-    private readonly Dictionary<T, Tuple<T, U, V>> elements = new();
+    private readonly Dictionary<TKey, Tuple<TKey, TValue1, TValue2>> _elements = new();
     
-    public void Add(T key, U value1, V value2)
+    public void Add(TKey key, TValue1 value1, TValue2 value2)
     {
-        if (elements.ContainsKey(key))
+        if (_elements.ContainsKey(key))
             throw new ArgumentException($"Key {key} already exists.", nameof(key));
 
-        elements[key] = Tuple.Create(key, value1, value2);
+        _elements[key] = Tuple.Create(key, value1, value2);
     }
-    public bool Remove(T key) => elements.Remove(key);
-
-    public bool ContainsKey(T key) => elements.ContainsKey(key);
     
-    public Tuple<T, U, V> this[T key] => elements.TryGetValue(key, out var element)
+    public bool Remove(TKey key) => _elements.Remove(key);
+
+    public bool ContainsKey(TKey key) => _elements.ContainsKey(key);
+    
+    public Tuple<TKey, TValue1, TValue2> this[TKey key] => _elements.TryGetValue(key, out var element)
         ? element
         : throw new KeyNotFoundException($"Key {key} not found.");
 
-    public int Count => elements.Count;
+    public int Count => _elements.Count;
 
-    public IEnumerator<Tuple<T, U, V>> GetEnumerator() => elements.Values.GetEnumerator();
+    public IEnumerator<Tuple<TKey, TValue1, TValue2>> GetEnumerator() => _elements.Values.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
@@ -73,7 +78,7 @@ class Program
 
         TestStringExtensions();
         TestArrayExtensions();
-        TestExtendedDictionary();
+        TestTripleDictionary();
     }
 
     /// <summary>
@@ -82,7 +87,7 @@ class Program
     static void TestStringExtensions()
     {
         string text = "hello world";
-        Console.WriteLine($"Інвертування: {text.ReverseString()}");
+        Console.WriteLine($"Інвертування: {text.Reverse()}");
         Console.WriteLine($"Кількість входжень символу 'l': {text.CountOccurrences('l')}");
     }
 
@@ -93,15 +98,15 @@ class Program
     {
         int[] numbers = { 1, 2, 2, 3, 4, 4, 4, 5 };
         Console.WriteLine($"Кількість входжень числа 4: {numbers.CountOccurrences(4)}");
-        Console.WriteLine($"Масив унікальних елементів: {string.Join(", ", numbers.ToUniqueArray())}");
+        Console.WriteLine($"Масив унікальних елементів: {string.Join(", ", numbers.GetUniqueElements())}");
     }
 
     /// <summary>
     /// Тестує роботу розширеного словника.
     /// </summary>
-    static void TestExtendedDictionary()
+    static void TestTripleDictionary()
     {
-        var dictionary = new ExtendedDictionary<int, string, string>();
+        var dictionary = new TripleDictionary<int, string, string>();
         dictionary.Add(1, "Аліса", "Менеджер");
         dictionary.Add(2, "Василь", "Розробник");
         dictionary.Add(3, "Роман", "Аналітик");
